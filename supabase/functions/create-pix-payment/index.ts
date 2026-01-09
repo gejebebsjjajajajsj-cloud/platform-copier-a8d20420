@@ -10,10 +10,6 @@ const SYNC_PAYMENTS_BASE_URL = "https://api.syncpayments.com.br";
 interface PaymentRequest {
   amount: number;
   planName: string;
-  customerName: string;
-  customerCpf: string;
-  customerEmail: string;
-  customerPhone: string;
 }
 
 serve(async (req) => {
@@ -62,7 +58,7 @@ serve(async (req) => {
     const paymentData: PaymentRequest = await req.json();
     console.log("Creating payment for:", paymentData.planName, "Amount:", paymentData.amount);
 
-    // Step 3: Create cash-in (PIX payment)
+    // Step 3: Create cash-in (PIX payment) - without customer data for direct payment
     const cashInResponse = await fetch(`${SYNC_PAYMENTS_BASE_URL}/api/partner/v1/cash-in`, {
       method: "POST",
       headers: {
@@ -73,12 +69,6 @@ serve(async (req) => {
       body: JSON.stringify({
         amount: paymentData.amount,
         description: `Assinatura ${paymentData.planName}`,
-        client: {
-          name: paymentData.customerName,
-          cpf: paymentData.customerCpf.replace(/\D/g, ""),
-          email: paymentData.customerEmail,
-          phone: paymentData.customerPhone.replace(/\D/g, ""),
-        },
       }),
     });
 
