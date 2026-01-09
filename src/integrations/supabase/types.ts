@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      payment_credentials: {
+        Row: {
+          created_at: string
+          domain: string
+          id: string
+          is_active: boolean
+          sync_client_id: string
+          sync_client_secret: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          domain: string
+          id?: string
+          is_active?: boolean
+          sync_client_id: string
+          sync_client_secret: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          domain?: string
+          id?: string
+          is_active?: boolean
+          sync_client_id?: string
+          sync_client_secret?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           avatar_url: string | null
@@ -40,6 +70,8 @@ export type Database = {
           stats_videos: number | null
           subscription_original_price: number | null
           subscription_price: number
+          sync_client_id: string | null
+          sync_client_secret: string | null
           updated_at: string
         }
         Insert: {
@@ -67,6 +99,8 @@ export type Database = {
           stats_videos?: number | null
           subscription_original_price?: number | null
           subscription_price?: number
+          sync_client_id?: string | null
+          sync_client_secret?: string | null
           updated_at?: string
         }
         Update: {
@@ -94,6 +128,8 @@ export type Database = {
           stats_videos?: number | null
           subscription_original_price?: number | null
           subscription_price?: number
+          sync_client_id?: string | null
+          sync_client_secret?: string | null
           updated_at?: string
         }
         Relationships: []
