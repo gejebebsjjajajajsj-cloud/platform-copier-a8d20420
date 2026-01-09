@@ -20,35 +20,18 @@ interface CashInRequest {
   };
 }
 
-interface Credentials {
-  sync_client_id: string;
-  sync_client_secret: string;
-}
-
-async function getCredentialsFromSettings(): Promise<Credentials | null> {
-  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-  const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+function getCredentials(): { sync_client_id: string; sync_client_secret: string } | null {
+  const sync_client_id = Deno.env.get("SYNC_PAYMENTS_CLIENT_ID");
+  const sync_client_secret = Deno.env.get("SYNC_PAYMENTS_CLIENT_SECRET");
   
-  const supabase = createClient(supabaseUrl, supabaseServiceKey);
-  
-  // Busca credenciais da tabela site_settings
-  const { data, error } = await supabase
-    .from("site_settings")
-    .select("sync_client_id, sync_client_secret")
-    .limit(1)
-    .single();
-  
-  if (error || !data?.sync_client_id || !data?.sync_client_secret) {
+  if (!sync_client_id || !sync_client_secret) {
     return null;
   }
   
-  return {
-    sync_client_id: data.sync_client_id,
-    sync_client_secret: data.sync_client_secret,
-  };
+  return { sync_client_id, sync_client_secret };
 }
 
-async function getAccessToken(credentials: Credentials): Promise<string> {
+async function getAccessToken(credentials: { sync_client_id: string; sync_client_secret: string }): Promise<string> {
   const response = await fetch(`${SYNC_API_BASE}/api/partner/v1/auth-token`, {
     method: "POST",
     headers: {
@@ -110,8 +93,8 @@ serve(async (req) => {
       );
     }
 
-    // Busca credenciais do site_settings
-    const credentials = await getCredentialsFromSettings();
+    // Busca credenciais dos secrets
+    const credentials = getCredentials();
 
     if (!credentials) {
       return new Response(
