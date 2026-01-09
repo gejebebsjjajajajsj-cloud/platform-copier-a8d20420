@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Copy, Check, Loader2, QrCode } from 'lucide-react';
+import { X, Copy, Check, Loader2 } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -149,8 +150,13 @@ const PaymentModal = ({ isOpen, onClose, planName, planPrice, primaryColor = '#f
             {!loading && !error && pixCode && (
               <div className="space-y-4">
                 <div className="flex items-center justify-center">
-                  <div className="bg-gray-100 p-6 rounded-2xl">
-                    <QrCode className="w-32 h-32 text-gray-800" />
+                  <div className="bg-white p-4 rounded-2xl border-2 border-gray-100 shadow-sm">
+                    <QRCodeSVG 
+                      value={pixCode} 
+                      size={180}
+                      level="M"
+                      includeMargin={false}
+                    />
                   </div>
                 </div>
 
