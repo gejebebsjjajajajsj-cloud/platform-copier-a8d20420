@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, Zap, ChevronDown, Crown } from 'lucide-react';
 import { SiteSettings } from '@/hooks/useSiteSettings';
+import PaymentModal from './PaymentModal';
 
 interface Plan {
   id: string;
@@ -18,6 +19,15 @@ interface SubscriptionCardProps {
 
 const SubscriptionCard = ({ settings }: SubscriptionCardProps) => {
   const [showPromos, setShowPromos] = useState(true);
+  const [paymentModal, setPaymentModal] = useState<{ isOpen: boolean; planName: string; planPrice: string }>({
+    isOpen: false,
+    planName: '',
+    planPrice: '',
+  });
+
+  const openPaymentModal = (planName: string, planPrice: string) => {
+    setPaymentModal({ isOpen: true, planName, planPrice });
+  };
 
   const plans: Plan[] = [
     { 
@@ -82,6 +92,7 @@ const SubscriptionCard = ({ settings }: SubscriptionCardProps) => {
       <motion.button 
         whileHover={{ scale: 1.01, y: -2 }}
         whileTap={{ scale: 0.99 }}
+        onClick={() => openPaymentModal('30 Dias', settings?.plan_30_days_price || 'R$ 9,90')}
         className="relative w-full text-white rounded-xl p-4 flex items-center justify-between shadow-lg hover:shadow-xl transition-shadow overflow-hidden group"
         style={{ 
           background: `linear-gradient(to bottom, ${primaryColor}, ${settings?.secondary_button_color || '#ea580c'})` 
@@ -141,6 +152,7 @@ const SubscriptionCard = ({ settings }: SubscriptionCardProps) => {
                     key={plan.id}
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
+                    onClick={() => openPaymentModal(plan.name, plan.price)}
                     className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all ${
                       plan.featured 
                         ? 'border-primary bg-orange-50 shadow-md' 
@@ -165,6 +177,15 @@ const SubscriptionCard = ({ settings }: SubscriptionCardProps) => {
           )}
         </AnimatePresence>
       </div>
+
+      {/* Payment Modal */}
+      <PaymentModal
+        isOpen={paymentModal.isOpen}
+        onClose={() => setPaymentModal({ ...paymentModal, isOpen: false })}
+        planName={paymentModal.planName}
+        planPrice={paymentModal.planPrice}
+        primaryColor={primaryColor}
+      />
     </motion.div>
   );
 };

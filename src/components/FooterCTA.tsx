@@ -1,11 +1,14 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { SiteSettings } from '@/hooks/useSiteSettings';
+import PaymentModal from './PaymentModal';
 
 interface FooterCTAProps {
   settings?: SiteSettings | null;
 }
 
 const FooterCTA = ({ settings }: FooterCTAProps) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const primaryColor = settings?.primary_button_color || '#f97316';
   const secondaryColor = settings?.secondary_button_color || '#ea580c';
 
@@ -14,6 +17,7 @@ const FooterCTA = ({ settings }: FooterCTAProps) => {
       <motion.button
         whileHover={{ scale: 1.02, y: -2 }}
         whileTap={{ scale: 0.98 }}
+        onClick={() => setIsModalOpen(true)}
         className="relative w-full text-white rounded-xl p-4 flex items-center justify-between shadow-lg hover:shadow-xl transition-shadow overflow-hidden animate-pulse-glow"
         style={{ 
           background: `linear-gradient(to bottom, ${primaryColor}, ${secondaryColor})` 
@@ -36,6 +40,15 @@ const FooterCTA = ({ settings }: FooterCTAProps) => {
         <span>•</span>
         <a href="#" className="hover:text-primary transition-colors">Política de Privacidade</a>
       </div>
+
+      {/* Payment Modal */}
+      <PaymentModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        planName="30 Dias"
+        planPrice={settings?.footer_button_price || 'R$ 9,90'}
+        primaryColor={primaryColor}
+      />
     </div>
   );
 };
