@@ -5,20 +5,41 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Lock, Mail, Eye, EyeOff } from 'lucide-react';
+import { Lock, Mail, Eye, EyeOff, UserPlus } from 'lucide-react';
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn } = useAuth();
+  const [isSignUp, setIsSignUp] = useState(false);
+  const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+
+    if (isSignUp) {
+      const { error } = await signUp(email, password);
+      if (error) {
+        toast({
+          title: 'Erro ao cadastrar',
+          description: error.message,
+          variant: 'destructive',
+        });
+        setIsLoading(false);
+        return;
+      }
+      toast({
+        title: 'Conta criada!',
+        description: 'Agora faça login para continuar.',
+      });
+      setIsSignUp(false);
+      setIsLoading(false);
+      return;
+    }
 
     const { error } = await signIn(email, password);
 
@@ -46,11 +67,13 @@ const AdminLogin = () => {
         <div className="bg-card border border-border rounded-2xl p-8 shadow-lg">
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Lock className="w-8 h-8 text-primary" />
+              {isSignUp ? <UserPlus className="w-8 h-8 text-primary" /> : <Lock className="w-8 h-8 text-primary" />}
             </div>
-            <h1 className="text-2xl font-bold text-foreground">Painel Admin</h1>
+            <h1 className="text-2xl font-bold text-foreground">
+              {isSignUp ? 'Criar Conta' : 'Painel Admin'}
+            </h1>
             <p className="text-muted-foreground text-sm mt-2">
-              Faça login para acessar o painel
+              {isSignUp ? 'Cadastre-se para continuar' : 'Faça login para acessar o painel'}
             </p>
           </div>
 
@@ -99,9 +122,19 @@ const AdminLogin = () => {
               className="w-full gradient-primary-vertical text-primary-foreground font-bold"
               disabled={isLoading}
             >
-              {isLoading ? 'Entrando...' : 'Entrar'}
+              {isLoading ? (isSignUp ? 'Cadastrando...' : 'Entrando...') : (isSignUp ? 'Cadastrar' : 'Entrar')}
             </Button>
           </form>
+
+          <div className="mt-6 text-center">
+            <button
+              type="button"
+              onClick={() => setIsSignUp(!isSignUp)}
+              className="text-sm text-primary hover:underline"
+            >
+              {isSignUp ? 'Já tem conta? Faça login' : 'Não tem conta? Cadastre-se'}
+            </button>
+          </div>
         </div>
       </div>
     </div>
