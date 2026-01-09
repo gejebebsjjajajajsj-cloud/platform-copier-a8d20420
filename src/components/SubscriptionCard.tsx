@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, Zap, ChevronDown, Crown } from 'lucide-react';
 import { SiteSettings } from '@/hooks/useSiteSettings';
+import { PixPaymentModal } from './PixPaymentModal';
 
 interface Plan {
   id: string;
   name: string;
   price: string;
+  amount: number;
   badge?: string;
   badgeType?: 'popular' | 'best' | 'premium';
   featured?: boolean;
@@ -17,13 +19,28 @@ interface SubscriptionCardProps {
 }
 
 const SubscriptionCard = ({ settings }: SubscriptionCardProps) => {
+  const [pixModalOpen, setPixModalOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [showPromos, setShowPromos] = useState(true);
+
+  const parsePrice = (priceStr: string): number => {
+    const cleaned = priceStr.replace(/[^\d,]/g, '').replace(',', '.');
+    return parseFloat(cleaned) || 0;
+  };
+
+  const plan30Days: Plan = {
+    id: '30days',
+    name: '30 Dias',
+    price: settings?.plan_30_days_price || 'R$ 9,90',
+    amount: parsePrice(settings?.plan_30_days_price || 'R$ 9,90'),
+  };
 
   const plans: Plan[] = [
     { 
       id: '3months', 
       name: '3 Meses', 
-      price: settings?.plan_3_months_price || 'R$ 19,90', 
+      price: settings?.plan_3_months_price || 'R$ 19,90',
+      amount: parsePrice(settings?.plan_3_months_price || 'R$ 19,90'),
       badge: 'Mais popular 🔥', 
       badgeType: 'popular', 
       featured: true 
@@ -31,18 +48,25 @@ const SubscriptionCard = ({ settings }: SubscriptionCardProps) => {
     { 
       id: '1year', 
       name: '1 Ano', 
-      price: settings?.plan_1_year_price || 'R$ 49,90', 
+      price: settings?.plan_1_year_price || 'R$ 49,90',
+      amount: parsePrice(settings?.plan_1_year_price || 'R$ 49,90'),
       badge: 'Melhor oferta', 
       badgeType: 'best' 
     },
     { 
       id: 'lifetime', 
       name: 'Vitalício', 
-      price: settings?.plan_lifetime_price || 'R$ 89,90', 
+      price: settings?.plan_lifetime_price || 'R$ 89,90',
+      amount: parsePrice(settings?.plan_lifetime_price || 'R$ 89,90'),
       badge: 'Exclusivo', 
       badgeType: 'premium' 
     },
   ];
+
+  const handlePlanClick = (plan: Plan) => {
+    setSelectedPlan(plan);
+    setPixModalOpen(true);
+  };
 
   const getBadgeStyles = (type?: string) => {
     switch (type) {
@@ -82,6 +106,7 @@ const SubscriptionCard = ({ settings }: SubscriptionCardProps) => {
       <motion.button 
         whileHover={{ scale: 1.01, y: -2 }}
         whileTap={{ scale: 0.99 }}
+        onClick={() => handlePlanClick(plan30Days)}
         className="relative w-full text-white rounded-xl p-4 flex items-center justify-between shadow-lg hover:shadow-xl transition-shadow overflow-hidden group"
         style={{ 
           background: `linear-gradient(to bottom, ${primaryColor}, ${settings?.secondary_button_color || '#ea580c'})` 
@@ -92,7 +117,7 @@ const SubscriptionCard = ({ settings }: SubscriptionCardProps) => {
         
         <span className="text-base font-bold z-10">30 Dias</span>
         <span className="text-xl font-extrabold z-10 flex items-center gap-1">
-          {settings?.plan_30_days_price || 'R$ 9,90'} <span className="font-black">→</span>
+          {plan30Days.price} <span className="font-black">→</span>
         </span>
       </motion.button>
 
@@ -141,6 +166,7 @@ const SubscriptionCard = ({ settings }: SubscriptionCardProps) => {
                     key={plan.id}
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
+                    onClick={() => handlePlanClick(plan)}
                     className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all ${
                       plan.featured 
                         ? 'border-primary bg-orange-50 shadow-md' 
@@ -165,6 +191,16 @@ const SubscriptionCard = ({ settings }: SubscriptionCardProps) => {
           )}
         </AnimatePresence>
       </div>
+
+      {selectedPlan && (
+        <PixPaymentModal
+          open={pixModalOpen}
+          onClose={() => setPixModalOpen(false)}
+          planName={selectedPlan.name}
+          amount={selectedPlan.amount}
+          buttonColor={primaryColor}
+        />
+      )}
     </motion.div>
   );
 };
