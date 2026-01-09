@@ -8,25 +8,27 @@ import FeedCard from '@/components/FeedCard';
 import FAQSection from '@/components/FAQSection';
 import FooterCTA from '@/components/FooterCTA';
 import NotificationToast from '@/components/NotificationToast';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 
-// Import images
+// Import fallback images
 import coverImage from '@/assets/cover-image.png';
 import perfil1 from '@/assets/perfil1.png';
 import feedImage1 from '@/assets/feed-image-1.png';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('videos');
+  const { data: settings } = useSiteSettings();
 
   const profileData = {
-    name: 'Kamylinha Santos',
-    username: 'eukamylinhasantos',
-    bio: 'Oi, meus amores! 🔥💦 Sou a Kamylinha Santos, a musa da dancinha do tiktok, e hoje vou revelar um lado meu que vai te deixar sem fôlego… Imagine vídeos gozando com meus ficantes, trisal com amigas safadas e momentos íntimos onde me entrego de corpo e alma. 😏 Cada centímetro do meu corpo é pura tentação e minhas fotos peladas são um convite exclusivo para você explorar seus desejos mais secretos – tudo sem censura! Se você tem coragem de se perder nessa paixão sem limites, vem comigo... Estou te esperando para uma experiência única e irresistível.😈💋',
-    coverImage: coverImage,
-    avatarImage: perfil1,
+    name: settings?.profile_name || 'Kamylinha Santos',
+    username: settings?.profile_username || 'eukamylinhasantos',
+    bio: settings?.profile_bio || 'Oi, meus amores! 🔥💦 Sou a Kamylinha Santos...',
+    coverImage: settings?.banner_url || coverImage,
+    avatarImage: settings?.avatar_url || perfil1,
     stats: {
-      photos: 354,
-      videos: 148,
-      likes: '20.2K'
+      photos: settings?.stats_photos || 354,
+      videos: settings?.stats_videos || 148,
+      likes: settings?.stats_likes || '20.2K'
     }
   };
 
@@ -51,8 +53,21 @@ const Index = () => {
     }
   ];
 
+  // Apply dynamic colors from settings
+  const dynamicStyles = settings ? {
+    '--dynamic-primary': settings.primary_button_color || '#f97316',
+    '--dynamic-secondary': settings.secondary_button_color || '#fdba74',
+    '--dynamic-background': settings.page_background_color || '#fefefe',
+  } as React.CSSProperties : {};
+
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div 
+      className="min-h-screen"
+      style={{ 
+        ...dynamicStyles,
+        backgroundColor: settings?.page_background_color || undefined 
+      }}
+    >
       <PromoBanner />
       <Header />
       
@@ -60,7 +75,7 @@ const Index = () => {
         <div className="space-y-4">
           <ProfileSection {...profileData} />
           
-          <SubscriptionCard />
+          <SubscriptionCard settings={settings} />
           
           <ContentToggle activeTab={activeTab} onTabChange={setActiveTab} />
           
@@ -69,7 +84,7 @@ const Index = () => {
             {feedItems.map((item, index) => (
               <FeedCard
                 key={index}
-                avatarImage={perfil1}
+                avatarImage={profileData.avatarImage}
                 name={profileData.name}
                 username={profileData.username}
                 mediaUrl={item.mediaUrl}
@@ -83,7 +98,7 @@ const Index = () => {
           
           <FAQSection />
           
-          <FooterCTA />
+          <FooterCTA settings={settings} />
         </div>
       </main>
 

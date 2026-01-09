@@ -16,43 +16,82 @@ export type Database = {
     Tables: {
       site_settings: {
         Row: {
+          avatar_url: string | null
           banner_url: string | null
           button_text: string
           created_at: string
           discount_percent: number | null
+          footer_button_price: string | null
+          footer_button_text: string | null
           id: string
           logo_url: string | null
+          page_background_color: string | null
+          plan_1_year_price: string | null
+          plan_3_months_price: string | null
+          plan_30_days_price: string | null
+          plan_lifetime_price: string | null
+          primary_button_color: string | null
           profile_bio: string | null
           profile_name: string
           profile_username: string
+          secondary_button_color: string | null
+          stats_likes: string | null
+          stats_photos: number | null
+          stats_videos: number | null
           subscription_original_price: number | null
           subscription_price: number
           updated_at: string
         }
         Insert: {
+          avatar_url?: string | null
           banner_url?: string | null
           button_text?: string
           created_at?: string
           discount_percent?: number | null
+          footer_button_price?: string | null
+          footer_button_text?: string | null
           id?: string
           logo_url?: string | null
+          page_background_color?: string | null
+          plan_1_year_price?: string | null
+          plan_3_months_price?: string | null
+          plan_30_days_price?: string | null
+          plan_lifetime_price?: string | null
+          primary_button_color?: string | null
           profile_bio?: string | null
           profile_name?: string
           profile_username?: string
+          secondary_button_color?: string | null
+          stats_likes?: string | null
+          stats_photos?: number | null
+          stats_videos?: number | null
           subscription_original_price?: number | null
           subscription_price?: number
           updated_at?: string
         }
         Update: {
+          avatar_url?: string | null
           banner_url?: string | null
           button_text?: string
           created_at?: string
           discount_percent?: number | null
+          footer_button_price?: string | null
+          footer_button_text?: string | null
           id?: string
           logo_url?: string | null
+          page_background_color?: string | null
+          plan_1_year_price?: string | null
+          plan_3_months_price?: string | null
+          plan_30_days_price?: string | null
+          plan_lifetime_price?: string | null
+          primary_button_color?: string | null
           profile_bio?: string | null
           profile_name?: string
           profile_username?: string
+          secondary_button_color?: string | null
+          stats_likes?: string | null
+          stats_photos?: number | null
+          stats_videos?: number | null
           subscription_original_price?: number | null
           subscription_price?: number
           updated_at?: string

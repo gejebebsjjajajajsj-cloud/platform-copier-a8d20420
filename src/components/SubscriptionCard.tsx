@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Zap, ChevronDown, Crown, Sparkles, Star } from 'lucide-react';
+import { Lock, Zap, ChevronDown, Crown } from 'lucide-react';
+import { SiteSettings } from '@/hooks/useSiteSettings';
 
 interface Plan {
   id: string;
@@ -11,13 +12,36 @@ interface Plan {
   featured?: boolean;
 }
 
-const SubscriptionCard = () => {
+interface SubscriptionCardProps {
+  settings?: SiteSettings | null;
+}
+
+const SubscriptionCard = ({ settings }: SubscriptionCardProps) => {
   const [showPromos, setShowPromos] = useState(true);
 
   const plans: Plan[] = [
-    { id: '3months', name: '3 Meses', price: 'R$ 19,90', badge: 'Mais popular 🔥', badgeType: 'popular', featured: true },
-    { id: '1year', name: '1 Ano', price: 'R$ 49,90', badge: 'Melhor oferta', badgeType: 'best' },
-    { id: 'lifetime', name: 'Vitalício', price: 'R$ 89,90', badge: 'Exclusivo', badgeType: 'premium' },
+    { 
+      id: '3months', 
+      name: '3 Meses', 
+      price: settings?.plan_3_months_price || 'R$ 19,90', 
+      badge: 'Mais popular 🔥', 
+      badgeType: 'popular', 
+      featured: true 
+    },
+    { 
+      id: '1year', 
+      name: '1 Ano', 
+      price: settings?.plan_1_year_price || 'R$ 49,90', 
+      badge: 'Melhor oferta', 
+      badgeType: 'best' 
+    },
+    { 
+      id: 'lifetime', 
+      name: 'Vitalício', 
+      price: settings?.plan_lifetime_price || 'R$ 89,90', 
+      badge: 'Exclusivo', 
+      badgeType: 'premium' 
+    },
   ];
 
   const getBadgeStyles = (type?: string) => {
@@ -32,6 +56,8 @@ const SubscriptionCard = () => {
         return 'bg-muted text-muted-foreground';
     }
   };
+
+  const primaryColor = settings?.primary_button_color || '#f97316';
 
   return (
     <motion.div 
@@ -56,14 +82,17 @@ const SubscriptionCard = () => {
       <motion.button 
         whileHover={{ scale: 1.01, y: -2 }}
         whileTap={{ scale: 0.99 }}
-        className="relative w-full gradient-primary-vertical text-primary-foreground rounded-xl p-4 flex items-center justify-between shadow-primary hover:shadow-primary-hover transition-shadow overflow-hidden group"
+        className="relative w-full text-white rounded-xl p-4 flex items-center justify-between shadow-lg hover:shadow-xl transition-shadow overflow-hidden group"
+        style={{ 
+          background: `linear-gradient(to bottom, ${primaryColor}, ${settings?.secondary_button_color || '#ea580c'})` 
+        }}
       >
         {/* Shimmer Effect */}
         <div className="absolute top-0 -left-[60%] w-[40%] h-full bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-[-20deg] animate-shimmer pointer-events-none" />
         
         <span className="text-base font-bold z-10">30 Dias</span>
         <span className="text-xl font-extrabold z-10 flex items-center gap-1">
-          R$ 9,90 <span className="font-black">→</span>
+          {settings?.plan_30_days_price || 'R$ 9,90'} <span className="font-black">→</span>
         </span>
       </motion.button>
 
@@ -80,7 +109,7 @@ const SubscriptionCard = () => {
         </span>
         <span>•</span>
         <span className="flex items-center gap-1">
-          <Zap className="w-3.5 h-3.5 text-primary" />
+          <Zap className="w-3.5 h-3.5" style={{ color: primaryColor }} />
           Acesso imediato
         </span>
       </div>
@@ -117,9 +146,10 @@ const SubscriptionCard = () => {
                         ? 'border-primary bg-orange-50 shadow-md' 
                         : 'border-orange-200 bg-card hover:border-primary hover:shadow-sm'
                     }`}
+                    style={plan.featured ? { borderColor: primaryColor } : {}}
                   >
                     <span className="flex items-center gap-2 font-bold text-foreground">
-                      {plan.featured && <Crown className="w-4 h-4 text-primary" />}
+                      {plan.featured && <Crown className="w-4 h-4" style={{ color: primaryColor }} />}
                       <span>{plan.name}</span>
                       {plan.badge && (
                         <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${getBadgeStyles(plan.badgeType)}`}>

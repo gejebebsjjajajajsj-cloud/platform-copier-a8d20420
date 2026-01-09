@@ -5,6 +5,7 @@ export interface SiteSettings {
   id: string;
   banner_url: string | null;
   logo_url: string | null;
+  avatar_url: string | null;
   profile_name: string;
   profile_username: string;
   profile_bio: string | null;
@@ -12,6 +13,18 @@ export interface SiteSettings {
   subscription_price: number;
   subscription_original_price: number | null;
   discount_percent: number | null;
+  primary_button_color: string | null;
+  secondary_button_color: string | null;
+  page_background_color: string | null;
+  footer_button_text: string | null;
+  footer_button_price: string | null;
+  plan_30_days_price: string | null;
+  plan_3_months_price: string | null;
+  plan_1_year_price: string | null;
+  plan_lifetime_price: string | null;
+  stats_photos: number | null;
+  stats_videos: number | null;
+  stats_likes: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -66,4 +79,21 @@ export const useUpdateSiteSettings = () => {
       queryClient.invalidateQueries({ queryKey: ['site-settings'] });
     },
   });
+};
+
+export const uploadSiteImage = async (file: File, path: string): Promise<string> => {
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${path}-${Date.now()}.${fileExt}`;
+  
+  const { error: uploadError } = await supabase.storage
+    .from('site-images')
+    .upload(fileName, file, { upsert: true });
+
+  if (uploadError) throw uploadError;
+
+  const { data } = supabase.storage
+    .from('site-images')
+    .getPublicUrl(fileName);
+
+  return data.publicUrl;
 };
