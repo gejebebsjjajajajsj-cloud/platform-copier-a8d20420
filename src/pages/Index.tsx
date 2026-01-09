@@ -20,9 +20,9 @@ const Index = () => {
   const { data: settings } = useSiteSettings();
 
   const profileData = {
-    name: settings?.profile_name || 'Tainá Costa',
-    username: settings?.profile_username || 'tainacosta',
-    bio: settings?.profile_bio || 'Oi, meus amores! 🔥💦 Sou a Tainá Costa...',
+    name: settings?.profile_name || 'Kamylinha Santos',
+    username: settings?.profile_username || 'eukamylinhasantos',
+    bio: settings?.profile_bio || 'Oi, meus amores! 🔥💦 Sou a Kamylinha Santos...',
     coverImage: settings?.banner_url || coverImage,
     avatarImage: settings?.avatar_url || perfil1,
     stats: {
@@ -34,16 +34,28 @@ const Index = () => {
 
   const feedItems = [
     {
-      mediaUrl: '/videos/video3.mp4',
+      mediaUrl: '/videos/video1.mp4',
       isVideo: true,
       likes: '42.1K',
       comments: '3.2K'
     },
     {
-      mediaUrl: '/videos/video4.mp4',
+      mediaUrl: '/videos/video2.mp4',
       isVideo: true,
       likes: '78.5K',
       comments: '5.6K'
+    },
+    {
+      mediaUrl: '/videos/video3.mp4',
+      isVideo: true,
+      likes: '35.8K',
+      comments: '2.1K'
+    },
+    {
+      mediaUrl: '/videos/video4.mp4',
+      isVideo: true,
+      likes: '61.2K',
+      comments: '4.3K'
     }
   ];
 
