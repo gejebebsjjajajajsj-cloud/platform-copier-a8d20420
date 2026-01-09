@@ -7,7 +7,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { LogOut, Save, Upload, Settings, User, Image, DollarSign, Palette, Camera } from 'lucide-react';
+import { LogOut, Save, Upload, Settings, User, Image, DollarSign, Palette, Camera, CreditCard, Plus, Trash2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+
+interface PaymentCredential {
+  id: string;
+  domain: string;
+  sync_client_id: string;
+  sync_client_secret: string;
+  is_active: boolean;
+}
 
 const Admin = () => {
   const { user, loading, isAdmin, signOut } = useAuth();
@@ -44,6 +53,64 @@ const Admin = () => {
   });
 
   const [uploading, setUploading] = useState<string | null>(null);
+  
+  // Payment credentials state
+  const [credentials, setCredentials] = useState<PaymentCredential[]>([]);
+  const [newCredential, setNewCredential] = useState({ domain: '', sync_client_id: '', sync_client_secret: '' });
+  const [loadingCredentials, setLoadingCredentials] = useState(false);
+
+  // Load payment credentials
+  useEffect(() => {
+    if (isAdmin) {
+      loadCredentials();
+    }
+  }, [isAdmin]);
+
+  const loadCredentials = async () => {
+    setLoadingCredentials(true);
+    const { data, error } = await supabase
+      .from('payment_credentials')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (!error && data) {
+      setCredentials(data as PaymentCredential[]);
+    }
+    setLoadingCredentials(false);
+  };
+
+  const addCredential = async () => {
+    if (!newCredential.domain || !newCredential.sync_client_id || !newCredential.sync_client_secret) {
+      toast({ title: 'Preencha todos os campos', variant: 'destructive' });
+      return;
+    }
+
+    const { error } = await supabase
+      .from('payment_credentials')
+      .insert([newCredential]);
+
+    if (error) {
+      toast({ title: 'Erro ao adicionar', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'Credencial adicionada!' });
+      setNewCredential({ domain: '', sync_client_id: '', sync_client_secret: '' });
+      loadCredentials();
+    }
+  };
+
+  const deleteCredential = async (id: string) => {
+    const { error } = await supabase
+      .from('payment_credentials')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      toast({ title: 'Erro ao remover', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'Credencial removida!' });
+      loadCredentials();
+    }
+  };
 
   useEffect(() => {
     if (!loading && !user) {
@@ -456,6 +523,76 @@ const Admin = () => {
               </div>
             </div>
           </div>
+
+          {/* Payment Credentials Section */}
+          {isAdmin && (
+            <div className="bg-card border border-border rounded-xl p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <CreditCard className="w-5 h-5 text-primary" />
+                <h2 className="text-lg font-bold text-foreground">Credenciais de Pagamento por Domínio</h2>
+              </div>
+
+              <p className="text-sm text-muted-foreground mb-4">
+                Configure credenciais Sync Payments diferentes para cada domínio. Cada site usará suas próprias credenciais.
+              </p>
+
+              {/* Add new credential */}
+              <div className="bg-muted/50 rounded-lg p-4 mb-4">
+                <h3 className="text-sm font-semibold mb-3">Adicionar Nova Credencial</h3>
+                <div className="space-y-3">
+                  <Input
+                    placeholder="Domínio (ex: meusite.com.br)"
+                    value={newCredential.domain}
+                    onChange={(e) => setNewCredential({ ...newCredential, domain: e.target.value })}
+                  />
+                  <Input
+                    placeholder="Client ID"
+                    value={newCredential.sync_client_id}
+                    onChange={(e) => setNewCredential({ ...newCredential, sync_client_id: e.target.value })}
+                  />
+                  <Input
+                    placeholder="Client Secret"
+                    type="password"
+                    value={newCredential.sync_client_secret}
+                    onChange={(e) => setNewCredential({ ...newCredential, sync_client_secret: e.target.value })}
+                  />
+                  <Button onClick={addCredential} className="w-full">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Adicionar Credencial
+                  </Button>
+                </div>
+              </div>
+
+              {/* List credentials */}
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold">Credenciais Cadastradas</h3>
+                {loadingCredentials ? (
+                  <p className="text-sm text-muted-foreground">Carregando...</p>
+                ) : credentials.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Nenhuma credencial cadastrada. O sistema usará as credenciais padrão.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {credentials.map((cred) => (
+                      <div key={cred.id} className="flex items-center justify-between bg-muted/30 rounded-lg p-3">
+                        <div>
+                          <p className="font-medium text-sm">{cred.domain}</p>
+                          <p className="text-xs text-muted-foreground">ID: {cred.sync_client_id.substring(0, 20)}...</p>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive hover:text-destructive"
+                          onClick={() => deleteCredential(cred.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Save Button */}
           <Button
