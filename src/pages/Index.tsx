@@ -36,26 +36,20 @@ const Index = () => {
     {
       mediaUrl: '/videos/video1.mp4',
       isVideo: true,
-      likes: '42.1K',
-      comments: '3.2K'
+      likes: '67.4K',
+      comments: '1.9K'
     },
     {
       mediaUrl: '/videos/video2.mp4',
       isVideo: true,
-      likes: '78.5K',
-      comments: '5.6K'
+      likes: '89.6K',
+      comments: '7.1K'
     },
     {
-      mediaUrl: '/videos/video3.mp4',
-      isVideo: true,
-      likes: '35.8K',
-      comments: '2.1K'
-    },
-    {
-      mediaUrl: '/videos/video4.mp4',
-      isVideo: true,
-      likes: '61.2K',
-      comments: '4.3K'
+      mediaUrl: feedImage1,
+      isVideo: false,
+      likes: '55.3K',
+      comments: '8.4K'
     }
   ];
 

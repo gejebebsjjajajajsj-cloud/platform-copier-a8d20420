@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { LogOut, Save, Upload, Settings, User, Image, DollarSign, Palette, Camera, CreditCard } from 'lucide-react';
+import { LogOut, Save, Upload, Settings, User, Image, DollarSign, Palette, Camera } from 'lucide-react';
 
 const Admin = () => {
   const { user, loading, isAdmin, signOut } = useAuth();
@@ -41,8 +41,6 @@ const Admin = () => {
     stats_photos: 354,
     stats_videos: 148,
     stats_likes: '20.2K',
-    sync_client_id: '',
-    sync_client_secret: '',
   });
 
   const [uploading, setUploading] = useState<string | null>(null);
@@ -77,8 +75,6 @@ const Admin = () => {
         stats_photos: settings.stats_photos || 354,
         stats_videos: settings.stats_videos || 148,
         stats_likes: settings.stats_likes || '20.2K',
-        sync_client_id: (settings as any).sync_client_id || '',
-        sync_client_secret: (settings as any).sync_client_secret || '',
       });
     }
   }, [settings]);
@@ -457,41 +453,6 @@ const Admin = () => {
                     />
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Payment Credentials Section */}
-          <div className="bg-card border border-border rounded-xl p-6">
-            <div className="flex items-center gap-2 mb-6">
-              <CreditCard className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-bold text-foreground">Credenciais Sync Payments</h2>
-            </div>
-
-            <p className="text-sm text-muted-foreground mb-4">
-              Configure suas credenciais do Sync Payments para receber pagamentos PIX.
-            </p>
-
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="sync_client_id">Client ID</Label>
-                <Input
-                  id="sync_client_id"
-                  value={formData.sync_client_id}
-                  onChange={(e) => setFormData({ ...formData, sync_client_id: e.target.value })}
-                  placeholder="Seu Client ID do Sync Payments"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="sync_client_secret">Client Secret</Label>
-                <Input
-                  id="sync_client_secret"
-                  type="password"
-                  value={formData.sync_client_secret}
-                  onChange={(e) => setFormData({ ...formData, sync_client_secret: e.target.value })}
-                  placeholder="Seu Client Secret do Sync Payments"
-                />
               </div>
             </div>
           </div>
